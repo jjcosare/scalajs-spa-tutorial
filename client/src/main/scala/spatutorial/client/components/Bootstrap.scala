@@ -67,7 +67,7 @@ object Bootstrap {
     class Backend(t: BackendScope[Props, Unit]) {
       def hide =
         // instruct Bootstrap to hide the modal
-        t.getDOMNode.map(jQuery(_).modal("hide")).void
+        t.getDOMNode.map(n => jQuery(n.toElement.get).modal("hide")).void
 
       // jQuery event handler to be fired when the modal has been hidden
       def hidden(e: JQueryEventObject): js.Any = {
@@ -94,9 +94,9 @@ object Bootstrap {
       .componentDidMount(scope => Callback {
         val p = scope.props
         // instruct Bootstrap to show the modal
-        jQuery(scope.getDOMNode).modal(js.Dynamic.literal("backdrop" -> p.backdrop, "keyboard" -> p.keyboard, "show" -> true))
+        jQuery(scope.getDOMNode.asElement).modal(js.Dynamic.literal("backdrop" -> p.backdrop, "keyboard" -> p.keyboard, "show" -> true))
         // register event listener to be notified when the modal is closed
-        jQuery(scope.getDOMNode).on("hidden.bs.modal", null, null, scope.backend.hidden _)
+        jQuery(scope.getDOMNode.asElement).on("hidden.bs.modal", null, null, scope.backend.hidden _)
       })
       .build
 

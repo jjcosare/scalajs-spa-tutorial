@@ -43,8 +43,8 @@ object MainMenu {
       <.ul(bss.navbar)(
         // build a list of menu items
         menuItems.toVdomArray(item =>
-          <.li(^.key := item.idx, (^.className := "active").when(props.currentLoc == item.location),
-          props.router.link(item.location)(item.icon, " ", item.label(props))
+          <.li(^.key := item.idx, if(props.currentLoc == item.location) (^.className := "nav-item active") else (^.className := "nav-item"),
+          props.router.link(item.location)(item.icon, "", item.label(props))(^.`class` := "nav-link")
         ))
       )
     }

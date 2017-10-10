@@ -13,8 +13,10 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
 import scalacss.ScalaCssReact._
 
-@JSExportTopLevel("SPAMain")
-object SPAMain extends js.JSApp {
+object SPAMain {
+
+  @JSExportTopLevel("SPAMain")
+  protected def getInstance(): this.type = this
 
   // Define the locations (pages) used in this application
   sealed trait Loc
@@ -39,9 +41,9 @@ object SPAMain extends js.JSApp {
   def layout(c: RouterCtl[Loc], r: Resolution[Loc]) = {
     <.div(
       // here we use plain Bootstrap class names as these are specific to the top level layout defined here
-      <.nav(^.className := "navbar navbar-inverse navbar-fixed-top",
+      <.nav(^.className := "navbar navbar-dark bg-dark fixed-top navbar-expand-md",
         <.div(^.className := "container",
-          <.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "SPA Tutorial")),
+          <.span(^.className := "navbar-brand", "SPA Tutorial"),
           <.div(^.className := "collapse navbar-collapse",
             // connect menu to model, because it needs to update when the number of open todos changes
             todoCountWrapper(proxy => MainMenu(c, r.page, proxy))
@@ -54,7 +56,7 @@ object SPAMain extends js.JSApp {
   }
 
   @JSExport
-  def main(): Unit = {
+  def main(args: Array[String]): Unit = {
     log.warn("Application starting")
     // send log messages also to the server
     log.enableServerLogging("/logging")

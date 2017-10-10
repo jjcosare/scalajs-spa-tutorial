@@ -9,7 +9,6 @@ import spatutorial.client.SPAMain.{Loc, TodoLoc}
 import spatutorial.client.components._
 
 import scala.util.Random
-import scala.language.existentials
 
 object Dashboard {
 
