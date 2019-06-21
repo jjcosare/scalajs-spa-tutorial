@@ -1,8 +1,0 @@
-{
-  "name": "server",
-  "version": "1.0.0",
-  "dependencies": {
-    "jsdom": "^15.1.1",
-    "sassify": "^4.0.1"
-  }
-}

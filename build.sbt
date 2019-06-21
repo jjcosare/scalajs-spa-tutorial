@@ -66,7 +66,7 @@ lazy val server = (project in file("server"))
       pipelineStages in Assets := Seq(scalaJSPipeline),
       pipelineStages := Seq(digest, gzip),
       // compress CSS
-      SassKeys.cssStyle in Assets:= Minified,
+      SassKeys.cssStyle in Assets := Minified,
       dependencyOverrides ++= Settings.dependencyOverrides.value
   )
   .enablePlugins(PlayScala)
@@ -78,9 +78,9 @@ lazy val server = (project in file("server"))
 lazy val ReleaseCmd = Command.command("release") {
     state => "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
       "client/clean" ::
-//      "client/test" ::
+      "client/test" ::
       "server/clean" ::
-//      "server/test" ::
+      "server/test" ::
       "server/dist" ::
       "set elideOptions in client := Seq()" ::
       state
@@ -90,4 +90,3 @@ lazy val ReleaseCmd = Command.command("release") {
 
 // loads the Play server project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
-//onLoad in Global := ("project server" :: (_: State)) compose (onLoad in Global).value

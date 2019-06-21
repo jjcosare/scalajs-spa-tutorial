@@ -8,7 +8,6 @@ import spatutorial.client.logger._
 import spatutorial.client.modules._
 import spatutorial.client.services.SPACircuit
 
-import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
 import scalacss.ScalaCssReact._
