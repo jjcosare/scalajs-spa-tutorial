@@ -42,15 +42,15 @@ object Bootstrap {
     def apply() = component
   }
 
-  object Panel {
+  object Card {
 
     case class Props(heading: String, style: CommonStyle.Value = CommonStyle.default)
 
-    val component = ScalaComponent.builder[Props]("Panel")
+    val component = ScalaComponent.builder[Props]("Card")
       .renderPC((_, p, c) =>
-        <.div(bss.panelOpt(p.style),
-          <.div(bss.panelHeading, p.heading),
-          <.div(bss.panelBody, c)
+        <.div(bss.cardOpt(p.style),
+          <.div(bss.cardHeading, p.heading),
+          <.div(bss.cardBody, c)
         )
       ).build
 

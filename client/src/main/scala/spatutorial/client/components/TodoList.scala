@@ -31,8 +31,8 @@ object TodoList {
           <.input.checkbox(^.checked := item.completed, ^.onChange --> p.stateChange(item.copy(completed = !item.completed))),
           <.span(" "),
           if (item.completed) <.s(item.content) else <.span(item.content),
-          Button(Button.Props(p.editItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Edit"),
-          Button(Button.Props(p.deleteItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Delete")
+          Button(Button.Props(p.editItem(item), addStyles = Seq(bss.floatRight, bss.buttonSM, bss.buttonSecondary)), "Edit"),
+          Button(Button.Props(p.deleteItem(item), addStyles = Seq(bss.floatRight, bss.buttonSM, bss.buttonSecondary, bss.spacingMR1)), "Delete")
         )
       }
       <.ul(style.listGroup)(p.items toTagMod renderItem)

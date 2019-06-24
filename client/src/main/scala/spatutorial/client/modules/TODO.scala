@@ -14,6 +14,8 @@ import spatutorial.shared._
 import scalacss.ScalaCssReact._
 
 object Todo {
+  // shorthand for styles
+  @inline private def bss = GlobalStyles.bootstrapStyles
 
   case class Props(proxy: ModelProxy[Pot[Todos]])
 
@@ -41,13 +43,13 @@ object Todo {
     }
 
     def render(p: Props, s: State) =
-      Panel(Panel.Props("What needs to be done"), <.div(
+      Card(Card.Props("What needs to be done"), <.div(
         p.proxy().renderFailed(ex => "Error loading"),
         p.proxy().renderPending(_ > 500, _ => "Loading..."),
         p.proxy().render(todos => TodoList(todos.items, item => p.proxy.dispatchCB(UpdateTodo(item)),
           item => editTodo(Some(item)), item => p.proxy.dispatchCB(DeleteTodo(item)))),
-        Button(Button.Props(editTodo(None)), Icon.plusSquare, " New")),
-        // if the dialog is open, add it to the panel
+        Button(Button.Props(editTodo(None), addStyles = Seq(bss.buttonSecondary, bss.spacingMT3)), Icon.plusSquare, " New")),
+        // if the dialog is open, add it to the card
         if (s.showTodoForm) TodoForm(TodoForm.Props(s.selectedItem, todoEdited))
         else // otherwise add an empty placeholder
           VdomArray.empty())
@@ -103,9 +105,9 @@ object TodoForm {
       val headerText = if (s.item.id == "") "Add new todo" else "Edit todo"
       Modal(Modal.Props(
         // header contains a cancel button (X)
-        header = hide => <.span(<.button(^.tpe := "button", bss.close, ^.onClick --> hide, Icon.close), <.h4(headerText)),
+        header = hide => React.Fragment(<.h4(headerText), <.button(^.tpe := "button", bss.close, ^.onClick --> hide, Icon.close)),
         // footer has the OK button that submits the form before hiding it
-        footer = hide => <.span(Button(Button.Props(submitForm() >> hide), "OK")),
+        footer = hide => <.span(Button(Button.Props(submitForm() >> hide, addStyles = Seq(bss.buttonSecondary)), "OK")),
         // this is called after the modal has been hidden (animation is completed)
         closed = formClosed(s, p)),
         <.div(bss.formGroup,

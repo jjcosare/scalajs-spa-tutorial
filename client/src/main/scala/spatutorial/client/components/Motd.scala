@@ -16,7 +16,7 @@ object Motd {
   // create the React component for holding the Message of the Day
   val Motd = ScalaComponent.builder[ModelProxy[Pot[String]]]("Motd")
     .render_P { proxy =>
-      Panel(Panel.Props("Message of the day"),
+      Card(Card.Props("Message of the day"),
         // render messages depending on the state of the Pot
         proxy().renderPending(_ > 500, _ => <.p("Loading...")),
         proxy().renderFailed(ex => <.p("Failed to load")),

@@ -27,19 +27,19 @@ class BootstrapStyles(implicit r: mutable.Register) extends StyleSheet.Inline()(
 
   val button = buttonOpt(default)
 
-  val panelOpt = commonStyle(csDomain, "panel")
+  val cardOpt = commonStyle(csDomain, "card")
 
-  val panel = panelOpt(default)
+  val card = cardOpt(default)
 
-  val labelOpt = commonStyle(csDomain, "label")
+  val badgeOpt = commonStyle(csDomain, "badge")
 
-  val label = labelOpt(default)
+  val badge = badgeOpt(default)
 
   val alert = commonStyle(contextDomain, "alert")
 
-  val panelHeading = styleWrap("panel-heading")
+  val cardHeading = styleWrap("card-header")
 
-  val panelBody = styleWrap("panel-body")
+  val cardBody = styleWrap("card-body")
 
   // wrap styles in a namespace, assign to val to prevent lazy initialization
   object modal {
@@ -61,14 +61,19 @@ class BootstrapStyles(implicit r: mutable.Register) extends StyleSheet.Inline()(
   }
 
   val _listGroup = listGroup
-  val pullRight = styleWrap("pull-right")
-  val buttonXS = styleWrap("btn-xs")
+  val floatRight = styleWrap("float-right")
+  val buttonSM = styleWrap("btn-sm")
+  val buttonSecondary = styleWrap("btn-secondary")
   val close = styleWrap("close")
 
-  val labelAsBadge = style(addClassName("label-as-badge"), borderRadius(1.em))
+  val badgePill = style(addClassName("badge-pill"), borderRadius(1.em))
 
   val navbar = styleWrap("navbar-nav", "mr-auto")
 
   val formGroup = styleWrap("form-group")
   val formControl = styleWrap("form-control")
+
+  val spacingMR1 = styleWrap("mr-1")
+  val spacingMT3 = styleWrap("mt-3")
+
 }

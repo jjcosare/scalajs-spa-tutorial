@@ -18,19 +18,19 @@ object MainMenu {
 
   case class Props(router: RouterCtl[Loc], currentLoc: Loc, proxy: ModelProxy[Option[Int]])
 
-  private case class MenuItem(idx: Int, label: (Props) => VdomNode, icon: Icon, location: Loc)
+  private case class MenuItem(idx: Int, badge: (Props) => VdomNode, icon: Icon, location: Loc)
 
   // build the Todo menu item, showing the number of open todos
   private def buildTodoMenu(props: Props): VdomElement = {
     val todoCount = props.proxy().getOrElse(0)
     <.span(
-      <.span("Todo "),
-      <.span(bss.labelOpt(CommonStyle.danger), bss.labelAsBadge, todoCount).when(todoCount > 0)
+      <.span(" Todo "),
+      <.span(bss.badgeOpt(CommonStyle.danger), bss.badgePill, todoCount).when(todoCount > 0)
     )
   }
 
   private val menuItems = Seq(
-    MenuItem(1, _ => "Dashboard", Icon.dashboard, DashboardLoc),
+    MenuItem(1, _ => " Dashboard", Icon.dashboard, DashboardLoc),
     MenuItem(2, buildTodoMenu, Icon.check, TodoLoc)
   )
 
@@ -44,7 +44,7 @@ object MainMenu {
         // build a list of menu items
         menuItems.toVdomArray(item =>
           <.li(^.key := item.idx, if(props.currentLoc == item.location) (^.className := "nav-item active") else (^.className := "nav-item"),
-          props.router.link(item.location)(item.icon, "", item.label(props))(^.`class` := "nav-link")
+          props.router.link(item.location)(item.icon, "", item.badge(props))(^.`class` := "nav-link")
         ))
       )
     }
