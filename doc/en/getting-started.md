@@ -37,5 +37,5 @@ Make sure to add `node_modules` directory to your `.gitignore` file!
 If you have installed node via nvm and you have issues with running tests about node being missing, run this command to resolve the issue:
 
 ```
-sudo ln -s "$(which node)" /usr/bin/node
+ln -s "$(which node)" ~/.local/bin/node
 ```

@@ -16,7 +16,7 @@ cache:
     - $HOME/.sbt/boot/
 install:
   - . $HOME/.nvm/nvm.sh
-  - nvm install --lts
+  - nvm install --latest-npm --lts=Dubnium
   - nvm use --lts
   - npm install
   - ln -s "$(which node)" $HOME/.local/bin/node
