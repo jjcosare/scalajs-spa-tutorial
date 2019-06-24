@@ -27,14 +27,15 @@ to define it through child component(s).
 object Button {
 
   case class Props(onClick: Callback, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
-
+  
   val component = ScalaComponent.builder[Props]("Button")
-    .renderPC((_, props, children) =>
-      <.button(bss.buttonOpt(props.style), props.addStyles.toTagMod, ^.tpe := "button", ^.onClick --> props.onClick, children)
+    .renderPC((_, p, c) =>
+      <.button(bss.buttonOpt(p.style), p.addStyles.toTagMod, ^.tpe := "button", ^.onClick --> p.onClick, c)
     ).build
-
-  def apply(props: Props, children: ReactNode*) = component(props)(children: _*)
+  
+  def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
   def apply() = component
+    
 }
 ```
 
@@ -42,26 +43,28 @@ This time the render method gets two parameters: The properties and the children
 button using Bootstrap CSS and binds `onClick` to the handler we defined in the properties. Finally the children are rendered within
 the button tag.
 
-Defining a Bootstrap Panel is about as simple.
+Defining a Bootstrap Card is about as simple.
 
 ```scala
-object Panel {
-  case class Props(heading: String, style: CommonStyle.Value = CommonStyle.default)
+object Card {
 
-  val component = ScalaComponent.builder[Props]("Panel")
+  case class Props(heading: String, style: CommonStyle.Value = CommonStyle.default)
+  
+  val component = ScalaComponent.builder[Props]("Card")
     .renderPC((_, p, c) =>
-      <.div(bss.panelOpt(p.style),
-        <.div(bss.panelHeading, p.heading),
-        <.div(bss.panelBody, c)
+      <.div(bss.cardOpt(p.style),
+        <.div(bss.cardHeading, p.heading),
+        <.div(bss.cardBody, c)
       )
     ).build
-
-  def apply(props: Props, children: ReactNode*) = component(props)(children: _*)
+  
+  def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
   def apply() = component
+  
 }
 ```
 
-The panel provides no interactivity but this time we define a separate `heading` in addition to using the children property.
+The card provides no interactivity but this time we define a separate `heading` in addition to using the children property.
 
 ## Icons
 

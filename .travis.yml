@@ -1,6 +1,6 @@
 language: scala
 scala:
-- 2.11.8
+- 2.12.8
 sudo: false
 jdk:
 - oraclejdk8
@@ -16,7 +16,7 @@ cache:
     - $HOME/.sbt/boot/
 install:
   - . $HOME/.nvm/nvm.sh
-  - nvm install stable
-  - nvm use stable
+  - nvm install --lts
+  - nvm use --lts
   - npm install
-  - npm install jsdom
+  - ln -s "$(which node)" $HOME/.local/bin/node

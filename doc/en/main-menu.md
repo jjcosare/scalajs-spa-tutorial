@@ -5,21 +5,21 @@ statically within the class itself, because the referred locations are anyway al
 a dynamic system, but static is just fine here.
 
 ```scala
-case class Props(ctl: RouterCtl[Loc], currentLoc: Loc, proxy: ModelProxy[Option[Int]])
+case class Props(router: RouterCtl[Loc], currentLoc: Loc, proxy: ModelProxy[Option[Int]])
 
-case class MenuItem(idx: Int, label: (Props) => VdomNode, icon: Icon, location: Loc)
+private case class MenuItem(idx: Int, badge: (Props) => VdomNode, icon: Icon, location: Loc)
 
 // build the Todo menu item, showing the number of open todos
 private def buildTodoMenu(props: Props): VdomElement = {
   val todoCount = props.proxy().getOrElse(0)
-  Seq(
-    <.span("Todo "),
-    <.span(bss.labelOpt(CommonStyle.danger), bss.labelAsBadge, todoCount).when(todoCount > 0)
+  <.span(
+    <.span(" Todo "),
+    <.span(bss.badgeOpt(CommonStyle.danger), bss.badgePill, todoCount).when(todoCount > 0)
   )
 }
 
 private val menuItems = Seq(
-  MenuItem(1, _ => "Dashboard", Icon.dashboard, DashboardLoc),
+  MenuItem(1, _ => " Dashboard", Icon.dashboard, DashboardLoc),
   MenuItem(2, buildTodoMenu, Icon.check, TodoLoc)
 )
 ```
@@ -30,20 +30,18 @@ the label is simple text, but for Todo we also render the number of open todos, 
 To render the menu we just loop over the items and create appropriate tags. For links we need to use the `RouterCtl` provided in the properties.
 
 ```scala
-private class Backend(t: BackendScope[Props, _]) {
-  def mounted(props: Props) = {
+private class Backend($: BackendScope[Props, Unit]) {
+  def mounted(props: Props) =
     // dispatch a message to refresh the todos
-    Callback.ifTrue(props.proxy.value.isEmpty, props.proxy.dispatchCB(RefreshTodos))
-  }
-
+    Callback.when(props.proxy.value.isEmpty)(props.proxy.dispatchCB(RefreshTodos))
+  
   def render(props: Props) = {
     <.ul(bss.navbar)(
       // build a list of menu items
-      for (item <- menuItems) yield {
-        <.li(^.key := item.idx, (^.className := "active").when(props.currentLoc == item.location),
-          props.router.link(item.location)(item.icon, " ", item.label(props))
-        )
-      }
+      menuItems.toVdomArray(item =>
+        <.li(^.key := item.idx, if(props.currentLoc == item.location) (^.className := "nav-item active") else (^.className := "nav-item"),
+        props.router.link(item.location)(item.icon, "", item.badge(props))(^.`class` := "nav-link")
+      ))
     )
   }
 }

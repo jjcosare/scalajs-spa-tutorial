@@ -19,21 +19,20 @@ and resources shared between the client and server. In the context of this tutor
 In a more realistic application you would have your data models etc. defined here.
 
 ```scala
-lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared"))
+lazy val shared = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("shared"))
   .settings(
-    scalaVersion := Settings.versions.scala,
-    libraryDependencies ++= Settings.sharedDependencies.value
+      scalaVersion := Settings.v.scala,
+      libraryDependencies ++= Settings.sharedDependencies.value
   )
   // set up settings specific to the JS project
-  .jsConfigure(_ enablePlugins ScalaJSPlay)
-  .jsSettings(sourceMapsBase := baseDirectory.value / "..")
+  .jsConfigure(_ enablePlugins ScalaJSWeb)
 ```
 
 The shared dependencies include libraries used by both client and server such as `autowire` and `boopickle` for client/server communication.
 ```scala
 val sharedDependencies = Def.setting(Seq(
-  "com.lihaoyi" %%% "autowire" % versions.autowire,
-  "me.chrons" %%% "boopickle" % versions.booPickle
+  "com.lihaoyi" %%% "autowire" % v.autowire,
+  "io.suzaku" %%% "boopickle" % v.booPickle
 ))
 ```
 
@@ -45,8 +44,8 @@ Client is defined as a normal Scala.js project by enabling the `ScalaJSPlugin` o
 lazy val client: Project = (project in file("client"))
   .settings(
     name := "client",
-    version := Settings.version,
-    scalaVersion := Settings.versions.scala,
+    version := Settings.v.app,
+    scalaVersion := Settings.v.scala,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Settings.scalajsDependencies.value,
     // by default we do development build, no eliding
@@ -54,27 +53,25 @@ lazy val client: Project = (project in file("client"))
     scalacOptions ++= elideOptions.value,
     jsDependencies ++= Settings.jsDependencies.value,
     // RuntimeDOM is needed for tests
-    jsDependencies += RuntimeDOM % "test",
+    jsEnv in Test := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv,
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
     // use Scala.js provided launcher code to start the client app
     scalaJSUseMainModuleInitializer := true,
     scalaJSUseMainModuleInitializer in Test := false,
-    // must specify source maps location because we use pure CrossProject
-    sourceMapsDirectories += sharedJS.base / "..",
     // use uTest framework for tests
-    testFrameworks += new TestFramework("utest.runner.Framework")
+    testFrameworks += new TestFramework("utest.runner.Framework"),
+    dependencyOverrides ++= Settings.dependencyOverrides.value
   )
-  .enablePlugins(ScalaJSPlugin, ScalaJSPlay)
+  .enablePlugins(ScalaJSPlugin, ScalaJSWeb)
   .dependsOn(sharedJS)
 ```
 
 First few settings are normal Scala settings, but let's go through the remaining settings to explain what they do.
 
 ```scala
-    // by default we do development build, no eliding
-    elideOptions := Seq(),
-    scalacOptions ++= elideOptions.value,
+  // use eliding to drop some debug code in the production build
+  lazy val elideOptions = settingKey[Seq[String]]("Set limit for elidable functions")
 ```
 Eliding is used to remove code that is not needed in the production build, such as debug logging. This setting is empty by default, but is enabled in
 the `release` command.
@@ -82,7 +79,7 @@ the `release` command.
 ```scala
     jsDependencies ++= Settings.jsDependencies.value,
     // RuntimeDOM is needed for tests
-    jsDependencies += RuntimeDOM % "test",
+    jsEnv in Test := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv,
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
 ```
@@ -99,16 +96,15 @@ This setting informs Scala.js plugin to generate a special `launcher.js` file, w
 your HTML template clean, as you don't need to specify the `main` function there.
 
 ```scala
-    // must specify source maps location because we use pure CrossProject
-    sourceMapsDirectories += sharedJS.base / "..",
-```
-Because we are using a pure `CrossProject`, the source map directories have to be manually adjusted to reflect where the source files can be found.
-
-```scala
     // use uTest framework for tests
     testFrameworks += new TestFramework("utest.runner.Framework")
 ```
 Lets SBT know that we are using uTest framework for tests.
+
+```scala
+    dependencyOverrides ++= Settings.dependencyOverrides.value
+```
+Fixes unresolved deps issue: https://github.com/webjars/webjars/issues/1789
 
 ```scala
   .enablePlugins(ScalaJSPlugin, ScalaJSPlay)
@@ -126,16 +122,21 @@ plugin, which is automatically included to all projects using `PlayScala` plugin
 lazy val server = (project in file("server"))
   .settings(
     name := "server",
-    version := Settings.version,
-    scalaVersion := Settings.versions.scala,
+    version := Settings.v.app,
+    scalaVersion := Settings.v.scala,
     scalacOptions ++= Settings.scalacOptions,
-    libraryDependencies ++= Settings.jvmDependencies.value,
+    libraryDependencies ++= Settings.jvmDependencies.value, 
+    libraryDependencies += guice,
     commands += ReleaseCmd,
+    // triggers scalaJSPipeline when using compile or continuous compilation
+    compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
     // connect to the client project
     scalaJSProjects := clients,
-    pipelineStages := Seq(scalaJSProd),
+    pipelineStages in Assets := Seq(scalaJSPipeline),
+    pipelineStages := Seq(digest, gzip),
     // compress CSS
-    LessKeys.compress in Assets := true
+    SassKeys.cssStyle in Assets := Minified,
+    dependencyOverrides ++= Settings.dependencyOverrides.value
   )
   .enablePlugins(PlayScala)
   .disablePlugins(PlayLayoutPlugin) // use the standard directory layout instead of Play's custom
@@ -152,15 +153,21 @@ We define a new SBT command `release` to run a sequence of commands to produce a
 ```scala
     // connect to the client project
     scalaJSProjects := clients,
-    pipelineStages := Seq(scalaJSProd),
+    pipelineStages in Assets := Seq(scalaJSPipeline),
+    pipelineStages := Seq(digest, gzip),
 ```
 Let the plugin know where our client project is and enable Scala.js processing in the pipeline.
 
 ```scala
     // compress CSS
-    LessKeys.compress in Assets := true,
+    SassKeys.cssStyle in Assets := Minified,
 ```
-This instructs the `sbt-less` plugin to minify the produced CSS.
+This instructs the `sbt-sassify` plugin to minify the produced CSS.
+
+```scala
+    dependencyOverrides ++= Settings.dependencyOverrides.value
+```
+Fixes unresolved deps issue: https://github.com/webjars/webjars/issues/1789
 
 
 ```scala
