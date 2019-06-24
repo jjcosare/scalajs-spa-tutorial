@@ -81,20 +81,9 @@ object Settings {
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    "org.webjars.npm" % "react" % v.react
-      / "umd/react.development.js"
-      minified "umd/react.production.min.js"
-      commonJSName "React",
-    "org.webjars.npm" % "react-dom" % v.react
-      / "umd/react-dom.development.js"
-      minified "umd/react-dom.production.min.js"
-      dependsOn "umd/react.development.js"
-      commonJSName "ReactDOM",
-    "org.webjars.npm" % "react-dom" % v.react
-      / "umd/react-dom-server.browser.development.js"
-      minified "umd/react-dom-server.browser.production.min.js"
-      dependsOn "umd/react-dom.development.js"
-      commonJSName "ReactDOMServer",
+    "org.webjars.npm" % "react" % v.react / "umd/react.development.js" minified "umd/react.production.min.js" commonJSName "React",
+    "org.webjars.npm" % "react-dom" % v.react / "umd/react-dom.development.js" minified "umd/react-dom.production.min.js" dependsOn "umd/react.development.js" commonJSName "ReactDOM",
+    "org.webjars.npm" % "react-dom" % v.react / "umd/react-dom-server.browser.development.js" minified "umd/react-dom-server.browser.production.min.js" dependsOn "umd/react-dom.development.js" commonJSName "ReactDOMServer",
     "org.webjars.npm" % "jquery" % v.jQuery / "dist/jquery.js" minified "jquery.min.js",
     "org.webjars.npm" % "bootstrap" % v.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "dist/jquery.js",
     "org.webjars.bower" % "chartjs" % v.chartjs / "Chart.js" minified "Chart.min.js",

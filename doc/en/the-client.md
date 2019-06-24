@@ -28,10 +28,18 @@ Once the browser has loaded all the resources, it will call the `SPAMain().main(
 entry point of the application. The class itself is very simple,
 
 ```scala
-@JSExport("SPAMain")
-object SPAMain extends JSApp {
+object SPAMain {
+
+	@JSExportTopLevel("SPAMain")
+	protected def getInstance(): this.type = this
+	
   @JSExport
-  def main(): Unit = {
+  def main(args: Array[String]): Unit = {
+    log.warn("Application starting")
+    // send log messages also to the server
+    log.enableServerLogging("/logging")
+    log.info("This message goes to server as well")
+
     // create stylesheet
     GlobalStyles.addToDocument()
     // create the router

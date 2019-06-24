@@ -18,13 +18,24 @@ changing for example the chart data in `Dashboard.scala` and reloading the web p
 
 ## Requirements
 
-SPA Tutorial uses Play 2.5 which depends on Java 8, so make sure you are using JVM 8 or later.
+SPA Tutorial uses Play 2.7 which depends on Java 8, so make sure you are using JVM 8 or later.
 
 Running client tests requires [Node.js](https://nodejs.org/) and `jsdom` to be installed. After installing `node` and its package manager `npm` you can
-install `jsdom` into your project folder with:
+install `jsdom` into your root folder with:
 
 ```
-npm install jsdom
+npm install
 ```
+`npm install` will refer to your package.json to install necessary dependencies:
+
+`jsdom` for client tests
+
+`sassify` for sass compilation
 
 Make sure to add `node_modules` directory to your `.gitignore` file!
+
+If you have installed node via nvm and you have issues with running tests about node being missing, run this command to resolve the issue:
+
+```
+sudo ln -s "$(which node)" /usr/bin/node
+```
